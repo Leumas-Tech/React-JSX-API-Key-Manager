@@ -92,3 +92,17 @@ Deletes all API keys for a user from IndexedDB.
 
 Conclusion
 By following these steps, you can integrate a secure and efficient API Key Manager into your React applications. This manager utilizes encryption to safeguard your keys and IndexedDB for persistence, offering a comprehensive solution for API key management.
+
+
+
+
+Homepage: [Leumas Technologies](https://leumas.tech)
+
+Contact Us: [Contact Leumas Technologies](https://leumas.tech/contact)
+
+Socials:
+
+- Facebook: [Leumas Technologies Facebook](https://www.facebook.com/leumastechnologies)
+- GitHub: [Leumas Technologies GitHub](https://github.com/Leumas-Tech)
+- YouTube: [Leumas Technologies YouTube](https://www.youtube.com/channel/UCVTuQGCqS1ucTPiomX-hLWQ)
+
