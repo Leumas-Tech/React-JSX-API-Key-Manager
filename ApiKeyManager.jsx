@@ -4,6 +4,8 @@ import useAuthUser from 'react-auth-kit/hooks/useAuthUser';
 import { encryptData, decryptData, saveToIndexedDB, getFromIndexedDB, generateEncryptionKey , deleteApiKeyFromDB , deleteAllApiKeysFromDB  } from './cryptoUtils';
 import { AtomSpinner } from 'react-epic-spinners';
 
+import { FaTrash } from 'react-icons/fa';
+
 const ApiKeyManager = () => {
   const [apiKey, setApiKey] = useState('');
   const [apiKeyType, setApiKeyType] = useState(''); // State to store the API key type
@@ -115,12 +117,12 @@ const deleteAll = async () => {
 
 
 // Styles
-const buttonStyle = `border border-blue-400 p-2 rounded-lg bg-blue-400 hover:bg-black text-white text-xs`
+const buttonStyle = `border border-blue-400 p-2 rounded-lg bg-blue-400 hover:bg-black text-white text-xs min-w-24 max-w-24`
 
   
   
 return (
-    <div className="container mx-auto p-4">
+    <div className="container mx-auto p-4 border rounded-lg max-w-screen">
       <div className="mb-4 w-full flex gap-2 py-4 px-2">
         <input
           type="text"
@@ -139,83 +141,56 @@ return (
           <option className='bg-blue-400 text-white' value="Printify">Printify</option>
           {/* Add more API key types here as needed */}
         </select>
-
-        
       </div>
-
-      <div className='flex w-full items-center justify-between p-4'>
-      <button onClick={deleteAll} className={`${buttonStyle}`}>Delete All</button>
-      <button onClick={handleSaveKey} className={`${buttonStyle}`}>Save Key</button>
-      <button onClick={handleRetrieveKey} className={`${buttonStyle}`}>View Keys</button>
-      </div>
-     
   
-      <div className="mt-4 w-full flex flex-col items-center gap-2 p-2 border max-h-64 min-h-64 overflow-y-scroll">
+      {/* Responsive adjustment for stacking on mobile/tablet and side-by-side on larger screens */}
+      <div className='flex flex-col md:flex-row w-full h-full'>
+  
+        {/* Buttons container, will stack above on mobile/tablet */}
+        <div className='flex md:flex-col gap-2 md:w-1/3 items-center justify-between p-4 border rounded-lg'>
+          <button onClick={deleteAll} className={`${buttonStyle}`}>Delete All</button>
+          <button onClick={handleSaveKey} className={`${buttonStyle}`}>Save Key</button>
+          <button onClick={handleRetrieveKey} className={`${buttonStyle}`}>View Keys</button>
+        </div>
+  
+        {/* API keys container, will follow the buttons on mobile/tablet */}
+        <div className="flex-grow w-full flex flex-col items-center gap-2 p-2 border h-full min-h-64 max-h-64 overflow-y-scroll rounded-lg">
   {apiKeys.length === 0 ? (
-    <div className="flex flex-col items-center justify-center">
-      <AtomSpinner size={60} color="#4299E1" /> {/* Customize size and color as needed */}
-      <p className="text-center text-blue-500 mt-4">Loading API keys...</p>
+    <div className="flex flex-col items-center justify-center border rounded-lg w-full h-full">
+      <AtomSpinner size={60} color="#4299E1" />
       <button
         onClick={handleRetrieveKey}
         className="mt-4 btn bg-blue-500 hover:bg-blue-700 text-white rounded-lg shadow px-4 py-2"
       >
-        Retrieve API Keys
+        Fetch API Keys
       </button>
     </div>
   ) : (
     apiKeys.map((keyData, index) => (
-        <div key={index} className="flex items-center justify-between border p-4 rounded-lg mb-2 border border-red-400 w-full">
-        <div>
-          <p>Type: <span className="font-semibold">{keyData.apiKeyType}</span></p>
-          <p>Key: <span className="font-semibold">{keyData.apiKey}</span></p>
+      <div key={index} className="flex items-center justify-between border border-blue-400 shadow-md rounded-lg mb-2 p-4 w-full max-w-[300px] mx-auto lg:max-w-[700px] lg:w-full">
+        <div className="overflow-hidden">
+          <p className="truncate">Type: <span className="font-semibold">{keyData.apiKeyType}</span></p>
+          <p className="truncate">Key: <span className="font-semibold">{keyData.apiKey}</span></p>
         </div>
-        <div>
-          <button className={`${buttonStyle}`} onClick={() => deleteApiKey(index)}>Delete</button>
-        </div>
+        <button
+          className={`${buttonStyle} flex items-center justify-center`}
+          onClick={() => deleteApiKey(index)}
+          title="Delete API Key"
+        >
+          <FaTrash />
+        </button>
       </div>
     ))
   )}
 </div>
 
-
-
+  
+      </div>
+      
     </div>
   );
+  
   
 };
 
 export default ApiKeyManager;
-
-
-
-
-// // Alternative Base64 to ArrayBuffer conversion that bypasses atob()
-// function base64ToUint8Array(base64) {
-//     const padding = '='.repeat((4 - (base64.length % 4)) % 4);
-//     const base64Safe = (base64 + padding)
-//         .replace(/\-/g, '+')
-//         .replace(/_/g, '/');
-//     const rawData = window.atob(base64Safe);
-//     const outputArray = new Uint8Array(rawData.length);
-
-//     for (let i = 0; i < rawData.length; ++i) {
-//         outputArray[i] = rawData.charCodeAt(i);
-//     }
-
-//     return outputArray;
-// }
-
-// function byteArrayStringToUint8Array(byteArray) {
-//     // Check if the input is already a Uint8Array
-//     if (byteArray instanceof Uint8Array) {
-//         console.log("Input is already a Uint8Array", byteArray);
-//         return byteArray;
-//     } else if (typeof byteArray === 'string') {
-//         // If the input is a string, then split and convert
-//         console.log("Converting string to Uint8Array", byteArray);
-//         const byteValues = byteArray.split(',').map(Number);
-//         return new Uint8Array(byteValues);
-//     } else {
-//         throw new Error('Input format not recognized');
-//     }
-// }
