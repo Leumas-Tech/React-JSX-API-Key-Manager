@@ -164,3 +164,63 @@ export const getFromIndexedDB = async (storeName, userId) => {
     return Array.isArray(data) ? data : data ? [data] : [];
 };
 
+
+
+
+// Fetching API Key for another component 
+
+// In your cryptoUtils.js or a similar utility file
+
+export const fetchApiKeys = async (userId) => {
+    try {
+      const dataFromDB = await getFromIndexedDB('apiKeys', userId);
+      if (!dataFromDB || dataFromDB.length === 0) {
+        console.log('No API keys found for this user.');
+        return [];
+      }
+  
+      const apiKeysArray = Array.isArray(dataFromDB) ? dataFromDB : [dataFromDB];
+      const filteredApiKeysArray = apiKeysArray.filter(item => !Array.isArray(item));
+  
+      const keys = await Promise.all(filteredApiKeysArray.map(async (keyObj) => {
+        const { encryptedData, iv, salt } = keyObj;
+        const { key: encryptionKey } = await generateEncryptionKey(userId, false, salt);
+        const decryptedData = await decryptData({ encryptedData, iv }, encryptionKey);
+        return JSON.parse(decryptedData);
+      }));
+  
+      return keys;
+    } catch (error) {
+      console.error('Error fetching API keys:', error);
+      throw error; // Rethrow the error to be handled by the caller
+    }
+  };
+
+  
+  export const fetchApiKeysOfType = async (userId, apiKeyType) => {
+    try {
+        const dataFromDB = await getFromIndexedDB('apiKeys', userId);
+        if (!dataFromDB || dataFromDB.length === 0) {
+            console.log('No API keys found for this user.');
+            return [];
+        }
+
+        // Convert to array if not already, and filter non-array items
+        const apiKeysArray = Array.isArray(dataFromDB) ? dataFromDB : [dataFromDB];
+        const filteredApiKeysArray = apiKeysArray.filter(item => !Array.isArray(item));
+
+        const keys = await Promise.all(filteredApiKeysArray.map(async (keyObj) => {
+            const { encryptedData, iv, salt } = keyObj;
+            const { key: encryptionKey } = await generateEncryptionKey(userId, false, salt);
+            const decryptedData = await decryptData({ encryptedData, iv }, encryptionKey);
+            return JSON.parse(decryptedData);
+        }));
+
+        // Filter the keys by the specified apiKeyType
+        const keysOfType = keys.filter(key => key.apiKeyType === apiKeyType);
+        return keysOfType;
+    } catch (error) {
+        console.error(`Error fetching API keys of type ${apiKeyType}:`, error);
+        throw error; // Rethrow the error to be handled by the caller
+    }
+};
