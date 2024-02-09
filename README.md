@@ -90,7 +90,83 @@ Deletes a specific API key from the user's stored data in IndexedDB based on its
 ### deleteAllApiKeysFromDB: 
 Deletes all API keys for a user from IndexedDB.
 
-Conclusion
+### fetchApiKeys
+Fetches all API keys for user from within another component
+
+### fetchApiKeysOfType
+Fetches all saved api keys for a user by a certain type . Fetches all OpenAI Keys, or all Printify keys. ETC....
+
+# Utilizing API Keys with Component2
+After securely managing your API keys with the ApiKeyManager component, you might want to use these keys in different parts of your application. The Component2 component demonstrates how to retrieve and use a specific API key, making it perfect for scenarios where users are required to bring their own API keys for various services.
+
+### Step 4: Implement Component2
+Create a file named Component2.jsx in your project, which will be responsible for fetching and using an API key of a specific type. This component leverages the fetchApiKeysOfType utility function to fetch API keys filtered by type, allowing users to select and use an API key for their operations.
+
+```
+import React, { useEffect, useState } from 'react';
+import { fetchApiKeysOfType } from './cryptoUtils'; // Adjust the path based on your file structure
+import useAuthUser from 'react-auth-kit/hooks/useAuthUser';
+
+const Component2 = () => {
+  const [apiKeys, setApiKeys] = useState([]);
+  const [selectedAPIKey, setSelectedAPIKey] = useState('');
+  const userId = useAuthUser()?.id; // This should be dynamically determined based on your auth system
+  const apiKeyType = "OpenAI"; // Specify the type of API key you need
+
+  useEffect(() => {
+    const loadApiKeys = async () => {
+      try {
+        const keys = await fetchApiKeysOfType(userId, apiKeyType);
+        setApiKeys(keys);
+        if (keys.length > 0) {
+          setSelectedAPIKey(keys[0].apiKey); // Automatically select the first API key
+        }
+      } catch (error) {
+        console.error(`Failed to fetch API keys of type ${apiKeyType}:`, error);
+      }
+    };
+
+    loadApiKeys();
+  }, [userId, apiKeyType]);
+
+  // Function to handle API key selection from the dropdown
+  const handleChange = (event) => {
+    setSelectedAPIKey(event.target.value);
+  };
+
+  // Example function to demonstrate how the selected API key can be used
+  const useSelectedApiKey = () => {
+    console.log(`Using API Key: ${selectedAPIKey}`);
+    // Implement the logic to use the selected API key here
+  };
+
+  return (
+    <div>
+      <select onChange={handleChange} value={selectedAPIKey}>
+        {apiKeys.map((key, index) => (
+          <option key={index} value={key.apiKey}>
+            {key.apiKeyType} Key {index + 1}
+          </option>
+        ))}
+      </select>
+      <button onClick={useSelectedApiKey}>Use Selected API Key</button>
+    </div>
+  );
+};
+
+export default Component2;
+```
+
+### Integrating Component2 in Your Application
+With Component2 implemented, you can now embed it within your application to allow users to select and use their stored API keys. This is particularly useful for applications that require users to provide their own API keys for accessing third-party services or APIs.
+
+By adding Component2 to your application, you provide users with a seamless way to manage and utilize their API keys securely and efficiently.Perfect for Bring your own API Key applications in react jsx
+
+
+
+
+
+# Conclusion
 By following these steps, you can integrate a secure and efficient API Key Manager into your React applications. This manager utilizes encryption to safeguard your keys and IndexedDB for persistence, offering a comprehensive solution for API key management.
 
 
